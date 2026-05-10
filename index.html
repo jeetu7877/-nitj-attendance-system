@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>NITJ Attendance Management System</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#080d1a;--bg2:#0d1325;--bg3:#111827;
+  --glass:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.08);
+  --blue:#3b82f6;--indigo:#6366f1;--gold:#f59e0b;--green:#10b981;
+  --red:#ef4444;--purple:#8b5cf6;--cyan:#06b6d4;
+  --t1:#f1f5f9;--t2:#94a3b8;--t3:#475569;
+}
+html,body,#root{min-height:100vh;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t1);overflow-x:hidden;}
+h1,h2,h3,h4{font-family:'Syne',sans-serif;}
+::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:var(--bg2);}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+@keyframes glow{0%,100%{opacity:.6}50%{opacity:1}}
+@keyframes scanLine{0%{top:-2px}100%{top:100%}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.fade-up{animation:fadeUp .4s ease-out both;}
+.d1{animation-delay:.08s}.d2{animation-delay:.16s}.d3{animation-delay:.24s}.d4{animation-delay:.32s}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;border:none;transition:all .2s;white-space:nowrap;}
+.btn:disabled{opacity:.55;cursor:not-allowed;}
+.btn-primary{background:linear-gradient(135deg,var(--blue),var(--indigo));color:white;}
+.btn-primary:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 8px 25px rgba(99,102,241,.4);}
+.btn-danger{background:linear-gradient(135deg,#ef4444,#dc2626);color:white;}
+.btn-ghost{background:var(--glass);color:var(--t2);border:1px solid var(--border);}
+.btn-ghost:hover:not(:disabled){background:rgba(255,255,255,.08);color:var(--t1);}
+.btn-success{background:linear-gradient(135deg,var(--green),#059669);color:white;}
+.btn-warn{background:linear-gradient(135deg,var(--gold),#d97706);color:white;}
+.btn-sm{padding:7px 14px;font-size:13px;}
+.card{background:rgba(13,19,37,.75);border:1px solid var(--border);border-radius:16px;backdrop-filter:blur(10px);}
+.input{width:100%;padding:10px 14px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:10px;color:var(--t1);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border-color .2s;}
+.input:focus{border-color:var(--blue);}
+.input::placeholder{color:var(--t3);}
+select.input option{background:#0d1325;color:var(--t1);}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;}
+.badge-green{background:rgba(16,185,129,.15);color:#10b981;border:1px solid rgba(16,185,129,.3);}
+.badge-red{background:rgba(239,68,68,.15);color:#ef4444;border:1px solid rgba(239,68,68,.3);}
+.badge-yellow{background:rgba(245,158,11,.15);color:#f59e0b;border:1px solid rgba(245,158,11,.3);}
+.badge-blue{background:rgba(59,130,246,.15);color:#3b82f6;border:1px solid rgba(59,130,246,.3);}
+.badge-purple{background:rgba(139,92,246,.15);color:#8b5cf6;border:1px solid rgba(139,92,246,.3);}
+table{width:100%;border-collapse:collapse;}
+th{text-align:left;padding:11px 16px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);border-bottom:1px solid var(--border);}
+td{padding:11px 16px;font-size:13px;border-bottom:1px solid rgba(255,255,255,.04);}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(255,255,255,.02);}
+.sl{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:10px;cursor:pointer;transition:all .2s;color:var(--t2);font-size:14px;font-weight:500;user-select:none;}
+.sl:hover,.sl.act{background:rgba(59,130,246,.12);color:var(--blue);}
+.sl.act{background:rgba(59,130,246,.15);}
+.toast-cont{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none;}
+.toast-item{padding:13px 18px;border-radius:12px;font-size:13px;font-weight:500;animation:fadeUp .3s ease-out;display:flex;align-items:center;gap:10px;min-width:260px;max-width:360px;}
+.t-success{background:#0c2d22;border:1px solid rgba(16,185,129,.5);color:#6ee7b7;}
+.t-error{background:#2d0c0c;border:1px solid rgba(239,68,68,.5);color:#fca5a5;}
+.t-info{background:#0c1e40;border:1px solid rgba(59,130,246,.5);color:#93c5fd;}
+.t-warn{background:#2d1f0c;border:1px solid rgba(245,158,11,.5);color:#fde68a;}
+.cam-box{width:100%;aspect-ratio:16/9;background:#050810;border-radius:12px;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);}
+.scan-line{position:absolute;width:100%;height:2px;background:linear-gradient(90deg,transparent,#3b82f6,transparent);animation:scanLine 2s linear infinite;pointer-events:none;z-index:2;}
+.face-box{border:2px solid var(--green);border-radius:6px;position:absolute;animation:glow 1.5s infinite;z-index:3;}
+.grid-bg{position:fixed;inset:0;background-image:linear-gradient(rgba(59,130,246,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(59,130,246,.025) 1px,transparent 1px);background-size:50px 50px;pointer-events:none;z-index:0;}
+.stat-num{font-family:'Syne',sans-serif;font-size:30px;font-weight:800;}
+.offline-banner{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);border-radius:10px;padding:10px 16px;font-size:12px;color:#fca5a5;display:flex;align-items:center;gap:8px;}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const {useState,useEffect,useRef,useCallback}=React;
+
+// ── Backend URL ────────────────────────────────────────────────────────────────
+const API = "http://localhost:8000";
+
+const BRANCHES=[
+  {id:"CSE",name:"Computer Science & Engineering",icon:"💻",color:"#3b82f6",students:240},
+  {id:"IT",name:"Information Technology",icon:"🌐",color:"#6366f1",students:180},
+  {id:"ECE",name:"Electronics & Communication",icon:"📡",color:"#f59e0b",students:200},
+  {id:"EE",name:"Electrical Engineering",icon:"⚡",color:"#10b981",students:160},
+  {id:"ME",name:"Mechanical Engineering",icon:"⚙️",color:"#ef4444",students:200},
+  {id:"CE",name:"Civil Engineering",icon:"🏗️",color:"#8b5cf6",students:160},
+  {id:"ICE",name:"Instrumentation & Control",icon:"🎛️",color:"#06b6d4",students:120},
+  {id:"Textile",name:"Textile Technology",icon:"🧵",color:"#ec4899",students:100},
+  {id:"Biotech",name:"Biotechnology",icon:"🧬",color:"#84cc16",students:80},
+];
+
+// ── Toast system ───────────────────────────────────────────────────────────────
+let _toastSet=null;
+let _tid=0;
+let _toasts=[];
+function toast(msg,type="info"){
+  const id=++_tid;
+  _toasts=[..._toasts,{id,msg,type}];
+  if(_toastSet)_toastSet([..._toasts]);
+  setTimeout(()=>{_toasts=_toasts.filter(t=>t.id!==id);if(_toastSet)_toastSet([..._toasts]);},5000);
+}
+
+function Toasts(){
+  const[ts,setTs]=useState([]);
+  useEffect(()=>{_toastSet=setTs;},[]);
+  const icons={success:"✅",error:"❌",info:"ℹ️",warn:"⚠️"};
+  return <div className="toast-cont">{ts.map(t=><div key={t.id} className={`toast-item t-${t.type}`}>{icons[t.type]||"ℹ️"} {t.msg}</div>)}</div>;
+}
+
+function Spin({s=18,c="var(--blue)"}){
+  return <div style={{width:s,height:s,border:`2px solid rgba(255,255,255,.15)`,borderTopColor:c,borderRadius:"50%",animation:"spin .7s linear infinite",display:"inline-block",flexShrink:0}}/>;
+}
+
+// ── SVG Icons ──────────────────────────────────────────────────────────────────
+function Ic({p,s=18,cl,style}){return <svg width={s} height={s} viewBox="0 0 24 24" fill="currentColor" className={cl} style={style}><path d={p}/></svg>;}
+const P={
+  home:"M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z",
+  users:"M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z",
+  check:"M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z",
+  x:"M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z",
+  cam:"M12 15.2A3.2 3.2 0 0 1 8.8 12 3.2 3.2 0 0 1 12 8.8 3.2 3.2 0 0 1 15.2 12 3.2 3.2 0 0 1 12 15.2m0-7.2A4 4 0 0 0 8 12a4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m-5 11a1 1 0 0 1 1 1 1 1 0 0 1-1 1 1 1 0 0 1-1-1 1 1 0 0 1 1-1M20 4h-3.17L15 2H9L7.17 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z",
+  bar:"M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z",
+  dl:"M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z",
+  plus:"M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z",
+  srch:"M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z",
+  cog:"M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.57 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z",
+  book:"M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z",
+  edit:"M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z",
+  trash:"M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z",
+  logout:"M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z",
+  chev:"M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z",
+  face:"M9 11.75c-.69 0-1.25.56-1.25 1.25s.56 1.25 1.25 1.25 1.25-.56 1.25-1.25-.56-1.25-1.25-1.25zm6 0c-.69 0-1.25.56-1.25 1.25s.56 1.25 1.25 1.25 1.25-.56 1.25-1.25-.56-1.25-1.25-1.25zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8 0-.29.02-.58.05-.86 2.36-1.05 4.23-2.98 5.21-5.37C11.07 8.33 13.05 9.5 15 9.5c1.96 0 3.73-.75 5.07-1.97.6 1.1.93 2.37.93 3.73 0 4.42-3.59 8.01-8 8.01V20z",
+  warn:"M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z",
+  eye:"M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z",
+  refresh:"M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z",
+  wifi_off:"M24 .01L22.99 1 1 22.99 2.01 24l4.23-4.23.89.84L12 26l4.87-5.17.89-.84 3.9-3.9C22.58 16.72 23 17.82 23 19h2c0-1.72-.63-3.3-1.67-4.52l1.44-1.44C26.17 14.85 27 16.83 27 19h2c0-2.72-1.06-5.19-2.79-7.04L27.99 10.23 24 .01zM12 5c-1.41 0-2.75.25-4 .68L9.39 7.07C10.21 6.72 11.08 6.5 12 6.5c2.54 0 4.83 1.03 6.5 2.7l1.44-1.44C17.97 5.85 15.12 5 12 5zm0 3.5c-1.34 0-2.58.4-3.63 1.08L9.78 11C10.48 10.68 11.22 10.5 12 10.5c1.59 0 3.03.64 4.08 1.67l1.44-1.44C16.08 9.3 14.15 8.5 12 8.5zm0 3.5c-.78 0-1.5.25-2.09.67l2.09 2.09V12z",
+};
+
+// ── API helpers ────────────────────────────────────────────────────────────────
+async function apiFetch(path,opts={}){
+  const res = await fetch(`${API}${path}`,{
+    headers:{"Content-Type":"application/json",...(opts.headers||{})},
+    ...opts
+  });
+  if(!res.ok){
+    const err = await res.json().catch(()=>({detail:"Unknown error"}));
+    throw new Error(err.detail||"Request failed");
+  }
+  return res.json();
+}
+
+function captureFrame(videoEl){
+  const canvas = document.createElement("canvas");
+  canvas.width  = videoEl.videoWidth  || 640;
+  canvas.height = videoEl.videoHeight || 480;
+  canvas.getContext("2d").drawImage(videoEl,0,0);
+  return canvas.toDataURL("image/jpeg",0.85);
+}
+
+// ── Login ──────────────────────────────────────────────────────────────────────
+function Login({onLogin}){
+  const[email,setEmail]=useState("");
+  const[pass,setPass]=useState("");
+  const[loading,setLoading]=useState(false);
+  const[err,setErr]=useState("");
+  const[showP,setShowP]=useState(false);
+  const[backendOk,setBackendOk]=useState(null);
+
+  useEffect(()=>{
+    fetch(`${API}/health`).then(r=>{if(r.ok)setBackendOk(true);else setBackendOk(false);}).catch(()=>setBackendOk(false));
+  },[]);
+
+  const sub=async(e)=>{
+    e.preventDefault();setLoading(true);setErr("");
+    await new Promise(r=>setTimeout(r,700));
+    if(email==="rajesh.kumar@nitj.ac.in"&&pass==="admin123"){
+      onLogin({id:1,name:"Dr. Rajesh Kumar",email,employee_id:"NITJ002",department:"CSE",is_admin:true});
+    } else if(email.endsWith("@nitj.ac.in")&&pass.length>=6){
+      onLogin({id:2,name:"Prof. Faculty",email,employee_id:"NITJ00X",department:"Engineering",is_admin:false});
+    } else {
+      setErr("Invalid credentials. Use @nitj.ac.in email and minimum 6-char password.");
+    }
+    setLoading(false);
+  };
+
+  return (
+    <div style={{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",
+      background:"var(--bg)",backgroundImage:"radial-gradient(ellipse at 25% 50%,rgba(59,130,246,.07),transparent 60%),radial-gradient(ellipse at 75% 20%,rgba(99,102,241,.07),transparent 60%)",padding:20}}>
+      <div className="grid-bg"/>
+      <div style={{width:"100%",maxWidth:420,position:"relative",zIndex:1}}>
+        <div className="fade-up" style={{textAlign:"center",marginBottom:32}}>
+          <div style={{width:76,height:76,background:"linear-gradient(135deg,#1e3a5f,#1e1b4b)",borderRadius:20,margin:"0 auto 16px",display:"flex",alignItems:"center",justifyContent:"center",border:"2px solid rgba(99,102,241,.35)",boxShadow:"0 0 40px rgba(99,102,241,.2)",fontSize:34,animation:"float 3s ease-in-out infinite"}}>🎓</div>
+          <div style={{fontSize:10,letterSpacing:".18em",color:"var(--t3)",textTransform:"uppercase",marginBottom:4}}>Dr. B.R. Ambedkar</div>
+          <h1 style={{fontSize:22,fontWeight:800,background:"linear-gradient(135deg,#93c5fd,#818cf8)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>NIT Jalandhar</h1>
+          <div style={{fontSize:12,color:"var(--t3)",marginTop:4}}>AI Attendance Management System</div>
+        </div>
+
+        {backendOk===false&&(
+          <div className="offline-banner fade-up" style={{marginBottom:14}}>
+            <Ic p={P.warn} s={15}/> Backend offline — start FastAPI server at localhost:8000
+          </div>
+        )}
+        {backendOk===true&&(
+          <div style={{background:"rgba(16,185,129,.08)",border:"1px solid rgba(16,185,129,.25)",borderRadius:10,padding:"8px 14px",marginBottom:14,fontSize:12,color:"#6ee7b7",display:"flex",alignItems:"center",gap:6}}>
+            <span style={{width:6,height:6,background:"var(--green)",borderRadius:"50%",animation:"pulse 1.5s infinite",flexShrink:0}}/>
+            Backend connected
+          </div>
+        )}
+
+        <div className="card fade-up d1" style={{padding:32}}>
+          <h2 style={{fontSize:19,fontWeight:700,marginBottom:4}}>Faculty Portal</h2>
+          <p style={{fontSize:12,color:"var(--t3)",marginBottom:24}}>Access restricted to authorized faculty only</p>
+          {err&&<div style={{padding:"11px 14px",background:"rgba(239,68,68,.09)",border:"1px solid rgba(239,68,68,.3)",borderRadius:10,fontSize:12,color:"#fca5a5",marginBottom:16,display:"flex",gap:8,alignItems:"flex-start"}}><Ic p={P.warn} s={15} style={{flexShrink:0,marginTop:1}}/>{err}</div>}
+          <form onSubmit={sub}>
+            <div style={{marginBottom:14}}>
+              <label style={{fontSize:11,fontWeight:700,color:"var(--t3)",textTransform:"uppercase",letterSpacing:".06em",display:"block",marginBottom:7}}>College Email</label>
+              <input className="input" type="email" placeholder="name@nitj.ac.in" value={email} onChange={e=>setEmail(e.target.value)} required/>
+            </div>
+            <div style={{marginBottom:22}}>
+              <label style={{fontSize:11,fontWeight:700,color:"var(--t3)",textTransform:"uppercase",letterSpacing:".06em",display:"block",marginBottom:7}}>Password</label>
+              <div style={{position:"relative"}}>
+                <input className="input" type={showP?"text":"password"} placeholder="Enter your password" value={pass} onChange={e=>setPass(e.target.value)} required style={{paddingRight:42}}/>
+                <button type="button" onClick={()=>setShowP(!showP)} style={{position:"absolute",right:11,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",cursor:"pointer",color:"var(--t3)"}}><Ic p={P.eye} s={17}/></button>
+              </div>
+            </div>
+            <button className="btn btn-primary" type="submit" disabled={loading} style={{width:"100%",justifyContent:"center",padding:"13px 20px",fontSize:14}}>
+              {loading?<><Spin s={15}/> Authenticating...</>:<><Ic p={P.check} s={17}/> Sign In to Portal</>}
+            </button>
+          </form>
+          <div style={{marginTop:20,padding:"12px 14px",background:"rgba(59,130,246,.06)",border:"1px solid rgba(59,130,246,.14)",borderRadius:10}}>
+            <div style={{fontSize:11,color:"var(--t3)",marginBottom:5,fontWeight:700}}>Demo Credentials</div>
+            <div style={{fontSize:12,color:"var(--t2)"}}>📧 rajesh.kumar@nitj.ac.in</div>
+            <div style={{fontSize:12,color:"var(--t2)"}}>🔑 admin123</div>
+          </div>
+        </div>
+        <p style={{textAlign:"center",fontSize:11,color:"var(--t3)",marginTop:20}}>🔒 Face Recognition Powered • © 2025 NIT Jalandhar</p>
+      </div>
+    </div>
+  );
+}
+
+// ── Sidebar ────────────────────────────────────────────────────────────────────
+function Sidebar({av,setAv,teacher,onLogout,col,setCol}){
+  const links=[
+    {id:"dashboard",label:"Dashboard",p:P.home},
+    {id:"attendance",label:"Take Attendance",p:P.cam},
+    {id:"register",label:"Register Student",p:P.face},
+    {id:"branches",label:"Branches",p:P.book},
+    {id:"students",label:"Students",p:P.users},
+    {id:"records",label:"Records",p:P.bar},
+    {id:"reports",label:"Reports",p:P.dl},
+    ...(teacher?.is_admin?[{id:"admin",label:"Admin Panel",p:P.cog}]:[]),
+  ];
+  const w=col?68:238;
+  return (
+    <div style={{width:w,minHeight:"100vh",background:"var(--bg2)",borderRight:"1px solid var(--border)",display:"flex",flexDirection:"column",transition:"width .25s",position:"fixed",top:0,left:0,zIndex:100,overflow:"hidden",flexShrink:0}}>
+      <div style={{padding:col?"18px 12px":"18px 18px",borderBottom:"1px solid var(--border)",display:"flex",alignItems:"center",gap:10}}>
+        <div style={{width:34,height:34,background:"linear-gradient(135deg,#1e3a5f,#1e1b4b)",borderRadius:9,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,border:"1px solid rgba(99,102,241,.3)",fontSize:17}}>🎓</div>
+        {!col&&<div><div style={{fontSize:13,fontWeight:800,lineHeight:1.2}}>NIT Jalandhar</div><div style={{fontSize:9,color:"var(--t3)",letterSpacing:".07em",marginTop:1}}>AI ATTENDANCE</div></div>}
+      </div>
+      <nav style={{flex:1,padding:"14px 8px",display:"flex",flexDirection:"column",gap:1}}>
+        {links.map(l=>(
+          <div key={l.id} className={`sl ${av===l.id?"act":""}`} onClick={()=>setAv(l.id)} style={{justifyContent:col?"center":"flex-start"}} title={col?l.label:""}>
+            <Ic p={l.p} s={17}/>
+            {!col&&<span>{l.label}</span>}
+            {!col&&av===l.id&&<div style={{marginLeft:"auto",width:5,height:5,background:"var(--blue)",borderRadius:"50%"}}/>}
+          </div>
+        ))}
+      </nav>
+      {!col&&<div style={{padding:"0 8px 8px"}}>
+        <div style={{padding:"10px 12px",background:"var(--glass)",borderRadius:11,border:"1px solid var(--border)",marginBottom:6}}>
+          <div style={{fontSize:12,fontWeight:600,marginBottom:1}}>{teacher?.name}</div>
+          <div style={{fontSize:10,color:"var(--t3)"}}>{teacher?.department}</div>
+          {teacher?.is_admin&&<span className="badge badge-blue" style={{fontSize:9,marginTop:5,padding:"2px 7px"}}>Admin</span>}
+        </div>
+      </div>}
+      <div style={{padding:"0 8px 12px"}}>
+        <div className="sl" onClick={onLogout} style={{justifyContent:col?"center":"flex-start",color:"var(--red)"}}>
+          <Ic p={P.logout} s={17}/>{!col&&<span>Logout</span>}
+        </div>
+      </div>
+      <button onClick={()=>setCol(!col)} style={{position:"absolute",top:22,right:-10,width:22,height:22,background:"var(--bg3)",border:"1px solid var(--border)",borderRadius:"50%",cursor:"pointer",color:"var(--t2)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:101}}>
+        <div style={{transform:col?"none":"rotate(180deg)",transition:"transform .25s",display:"flex"}}><Ic p={P.chev} s={13}/></div>
+      </button>
+    </div>
+  );
+}
+
+function Topbar({title,teacher,sw}){
+  const d=new Date().toLocaleDateString("en-IN",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
+  return (
+    <div style={{position:"fixed",top:0,left:sw,right:0,height:62,zIndex:90,background:"rgba(8,13,26,.92)",backdropFilter:"blur(12px)",borderBottom:"1px solid var(--border)",display:"flex",alignItems:"center",justifyContent:"space-between",padding:"0 26px",transition:"left .25s"}}>
+      <div><h2 style={{fontSize:17,fontWeight:700}}>{title}</h2><div style={{fontSize:11,color:"var(--t3)",marginTop:1}}>{d}</div></div>
+      <div style={{display:"flex",alignItems:"center",gap:10}}>
+        <div style={{width:34,height:34,background:"linear-gradient(135deg,#1e3a8a,#312e81)",borderRadius:9,display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,fontWeight:800,border:"1px solid rgba(99,102,241,.3)"}}>{teacher?.name?.[0]||"T"}</div>
+        <div style={{display:"flex",flexDirection:"column"}}>
+          <span style={{fontSize:12,fontWeight:600}}>{teacher?.name}</span>
+          <span style={{fontSize:10,color:"var(--t3)"}}>{teacher?.employee_id}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Dashboard ──────────────────────────────────────────────────────────────────
+function Dashboard({teacher,setAv}){
+  const[stats,setStats]=useState(null);
+  const[records,setRecords]=useState([]);
+  const[loading,setLoading]=useState(true);
+  const[offline,setOffline]=useState(false);
+
+  const load=async()=>{
+    setLoading(true);setOffline(false);
+    try{
+      const[s,r]=await Promise.all([apiFetch("/stats"),apiFetch("/attendance")]);
+      setStats(s);setRecords(r.slice(0,8));
+    }catch(e){setOffline(true);}
+    setLoading(false);
+  };
+
+  useEffect(()=>{load();},[]);
+
+  return (
+    <div style={{display:"flex",flexDirection:"column",gap:20}}>
+      <div className="card fade-up" style={{padding:26,background:"linear-gradient(135deg,rgba(30,58,95,.6),rgba(30,27,75,.6))"}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:14}}>
+          <div>
+            <h2 style={{fontSize:22,fontWeight:800,marginBottom:5}}>Welcome back, {teacher?.name?.split(" ")[0]} 👋</h2>
+            <p style={{color:"var(--t2)",fontSize:13}}>{teacher?.department} • {teacher?.employee_id}</p>
+          </div>
+          <div style={{display:"flex",gap:10}}>
+            <button className="btn btn-ghost btn-sm" onClick={load}><Ic p={P.refresh} s={14}/> Refresh</button>
+            <button className="btn btn-primary btn-sm" onClick={()=>setAv("attendance")}><Ic p={P.cam} s={14}/> Take Attendance</button>
+          </div>
+        </div>
+      </div>
+
+      {offline&&<div className="offline-banner fade-up"><Ic p={P.warn} s={15}/> Backend offline — start FastAPI server: <code style={{fontFamily:"monospace",fontSize:11}}>uvicorn main:app --reload</code></div>}
+
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(190px,1fr))",gap:14}}>
+        {[
+          {label:"Total Students",val:loading?"…":stats?.total_students??0,icon:P.users,color:"#3b82f6"},
+          {label:"Face Enrolled",val:loading?"…":stats?.face_enrolled??0,icon:P.face,color:"#6366f1"},
+          {label:"Today's Present",val:loading?"…":stats?.today_present??0,icon:P.check,color:"#10b981"},
+          {label:"Total Records",val:loading?"…":stats?.total_records??0,icon:P.bar,color:"#8b5cf6"},
+        ].map((s,i)=>(
+          <div key={s.label} className={`card fade-up d${i+1}`} style={{padding:22,position:"relative",overflow:"hidden"}}>
+            <div style={{position:"absolute",top:0,right:0,width:70,height:70,background:s.color,borderRadius:"50%",opacity:.07,transform:"translate(15px,-15px)"}}/>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
+              <div>
+                <div style={{fontSize:10,color:"var(--t3)",fontWeight:700,textTransform:"uppercase",letterSpacing:".07em",marginBottom:7}}>{s.label}</div>
+                <div className="stat-num">{s.val}</div>
+              </div>
+              <div style={{width:40,height:40,background:`${s.color}22`,borderRadius:10,display:"flex",alignItems:"center",justifyContent:"center",color:s.color,border:`1px solid ${s.color}44`,flexShrink:0}}>
+                <Ic p={s.icon} s={20}/>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="card fade-up" style={{overflow:"hidden"}}>
+        <div style={{padding:"14px 18px",borderBottom:"1px solid var(--border)"}}><h3 style={{fontSize:14,fontWeight:700}}>Recent Attendance</h3></div>
+        {loading?<div style={{padding:30,textAlign:"center"}}><Spin s={24}/></div>:records.length===0?(
+          <div style={{padding:30,textAlign:"center",color:"var(--t3)",fontSize:13}}>No records yet. Start taking attendance.</div>
+        ):(
+          <div style={{overflowX:"auto"}}>
+            <table>
+              <thead><tr><th>Student</th><th>Roll</th><th>Branch</th><th>Date</th><th>Time</th><th>Confidence</th></tr></thead>
+              <tbody>
+                {records.map((r,i)=>(
+                  <tr key={i}>
+                    <td style={{fontWeight:500}}>{r.name}</td>
+                    <td style={{fontFamily:"monospace",fontSize:12}}>{r.roll}</td>
+                    <td><span className="badge badge-blue">{r.branch}</span></td>
+                    <td style={{fontSize:12,color:"var(--t2)"}}>{r.date}</td>
+                    <td style={{fontSize:12,color:"var(--t2)"}}>{r.time}</td>
+                    <td>
+                      <div style={{display:"flex",alignItems:"center",gap:6}}>
+                        <div style={{width:44,height:4,background:"var(--border)",borderRadius:2,overflow:"hidden"}}>
+                          <div style={{width:`${r.confidence}%`,height:"100%",background:r.confidence>90?"var(--green)":r.confidence>80?"var(--gold)":"var(--red)",borderRadius:2}}/>
+                        </div>
+                        <span style={{fontSize:11,color:"var(--t3)"}}>{r.confidence?.toFixed(1)}%</span>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── Register Student (with real webcam + backend) ──────────────────────────────
+function RegisterStudent(){
+  const[form,setForm]=useState({name:"",roll:"",branch:"CSE",year:1,section:"A",email:""});
+  const[camOn,setCamOn]=useState(false);
+  const[stream,setStream]=useState(null);
+  const[preview,setPreview]=useState(null);
+  const[loading,setLoading]=useState(false);
+  const[captureMsg,setCaptureMsg]=useState("");
+  const vidRef=useRef(null);
+  const canvRef=useRef(null);
+
+  const startCam=async()=>{
+    try{
+      const s=await navigator.mediaDevices.getUserMedia({video:{width:640,height:480,facingMode:"user"}});
+      setStream(s);setCamOn(true);
+      setTimeout(()=>{if(vidRef.current)vidRef.current.srcObject=s;},100);
+      toast("Camera ready — position your face and capture","info");
+    }catch(e){toast("Camera access denied or unavailable","error");}
+  };
+
+  const stopCam=()=>{
+    stream?.getTracks().forEach(t=>t.stop());
+    setStream(null);setCamOn(false);setPreview(null);
+  };
+
+  useEffect(()=>()=>stopCam(),[]);
+
+  const capture=()=>{
+    if(!vidRef.current)return;
+    const dataUrl=captureFrame(vidRef.current);
+    setPreview(dataUrl);
+    setCaptureMsg("Photo captured! Click Register to save.");
+    toast("Face captured","success");
+  };
+
+  const register=async()=>{
+    if(!form.name||!form.roll){toast("Name and Roll Number are required","error");return;}
+    if(!preview){toast("Please capture a face photo first","error");return;}
+    setLoading(true);
+    try{
+      const res=await apiFetch("/register_student",{
+        method:"POST",
+        body:JSON.stringify({...form,year:parseInt(form.year),image:preview})
+      });
+      toast(res.message,"success");
+      setForm({name:"",roll:"",branch:"CSE",year:1,section:"A",email:""});
+      setPreview(null);setCaptureMsg("");
+      stopCam();
+    }catch(e){toast(e.message,"error");}
+    setLoading(false);
+  };
+
+  return (
+    <div style={{display:"flex",flexDirection:"column",gap:18}}>
+      <div className="card fade-up" style={{padding:24}}>
+        <h2 style={{fontSize:17,fontWeight:700,marginBottom:4}}>Register New Student</h2>
+        <p style={{fontSize:12,color:"var(--t3)"}}>Capture face photo + fill details — saved to SQLite + faces.pkl</p>
+      </div>
+
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}}>
+        {/* Form */}
+        <div className="card fade-up d1" style={{padding:22,display:"flex",flexDirection:"column",gap:14}}>
+          <h3 style={{fontSize:14,fontWeight:700}}>Student Details</h3>
+          {[
+            {k:"name",l:"Full Name",t:"text",ph:"e.g. Arjun Sharma"},
+            {k:"roll",l:"Roll Number",t:"text",ph:"e.g. 21CSE001"},
+            {k:"email",l:"Email (optional)",t:"email",ph:"student@nitj.ac.in"},
+          ].map(f=>(
+            <div key={f.k}>
+              <label style={{fontSize:11,color:"var(--t3)",display:"block",marginBottom:5,fontWeight:700,textTransform:"uppercase",letterSpacing:".05em"}}>{f.l}</label>
+              <input className="input" type={f.t} placeholder={f.ph} value={form[f.k]} onChange={e=>setForm(p=>({...p,[f.k]:e.target.value}))}/>
+            </div>
+          ))}
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:10}}>
+            <div>
+              <label style={{fontSize:11,color:"var(--t3)",display:"block",marginBottom:5,fontWeight:700,textTransform:"uppercase",letterSpacing:".05em"}}>Branch</label>
+              <select className="input" value={form.branch} onChange={e=>setForm(p=>({...p,branch:e.target.value}))}>
+                {BRANCHES.map(b=><option key={b.id} value={b.id}>{b.id}</option>)}
+              </select>
+            </div>
+            <div>
+              <label style={{fontSize:11,color:"var(--t3)",display:"block",marginBottom:5,fontWeight:700,textTransform:"uppercase",letterSpacing:".05em"}}>Year</label>
+              <select className="input" value={form.year} onChange={e=>setForm(p=>({...p,year:parseInt(e.target.value)}))}>
+                {[1,2,3,4].map(y=><option key={y} value={y}>Year {y}</option>)}
+              </select>
+            </div>
+            <div>
+              <label style={{fontSize:11,color:"var(--t3)",display:"block",marginBottom:5,fontWeight:700,textTransform:"uppercase",letterSpacing:".05em"}}>Section</label>
+              <select className="input" value={form.section} onChange={e=>setForm(p=>({...p,section:e.target.value}))}>
+                {["A","B","C"].map(s=><option key={s} value={s}>Sec {s}</option>)}
+              </select>
+            </div>
+          </div>
+          <button className="btn btn-primary" onClick={register} disabled={loading} style={{marginTop:4}}>
+            {loading?<><Spin s={15}/> Registering...</>:<><Ic p={P.check} s={16}/> Register Student</>}
+          </button>
+        </div>
+
+        {/* Camera */}
+        <div className="card fade-up d2" style={{padding:22,display:"flex",flexDirection:"column",gap:14}}>
+          <h3 style={{fontSize:14,fontWeight:700}}>Face Capture</h3>
+          <div className="cam-box" style={{aspectRatio:"4/3",borderColor:camOn?"rgba(16,185,129,.35)":"var(--border)"}}>
+            {camOn?(
+              <video ref={vidRef} autoPlay playsInline muted style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+            ):preview?(
+              <img src={preview} alt="Captured" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+            ):(
+              <div style={{textAlign:"center",color:"var(--t3)"}}>
+                <div style={{fontSize:48,marginBottom:10,opacity:.2}}>📷</div>
+                <div style={{fontSize:13}}>Camera not started</div>
+                <div style={{fontSize:11,marginTop:4}}>Click Start Camera below</div>
+              </div>
+            )}
+          </div>
+          {captureMsg&&<div style={{padding:"8px 12px",background:"rgba(16,185,129,.08)",border:"1px solid rgba(16,185,129,.2)",borderRadius:8,fontSize:12,color:"#6ee7b7"}}>{captureMsg}</div>}
+          <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+            {!camOn?(
+              <button className="btn btn-ghost btn-sm" onClick={startCam}><Ic p={P.cam} s={14}/> Start Camera</button>
+            ):(
+              <>
+                <button className="btn btn-success btn-sm" onClick={capture}><Ic p={P.face} s={14}/> Capture Face</button>
+                <button className="btn btn-ghost btn-sm" onClick={stopCam}><Ic p={P.x} s={14}/> Stop</button>
+              </>
+            )}
+            {preview&&!camOn&&<button className="btn btn-ghost btn-sm" onClick={()=>{setPreview(null);setCaptureMsg("");startCam();}}><Ic p={P.refresh} s={14}/> Retake</button>}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Attendance Taker (real recognition) ───────────────────────────────────────
+function AttendanceTaker({teacher}){
+  const[branch,setBranch]=useState("CSE");
+  const[year,setYear]=useState(3);
+  const[section,setSection]=useState("A");
+  const[subject,setSubject]=useState("");
+  const[camOn,setCamOn]=useState(false);
+  const[recog,setRecog]=useState(false);
+  const[detected,setDetected]=useState([]);
+  const[stream,setStream]=useState(null);
+  const[backendOk,setBackendOk]=useState(true);
+  const vidRef=useRef(null);
+  const intRef=useRef(null);
+
+  const startCam=async()=>{
+    try{
+      const s=await navigator.mediaDevices.getUserMedia({video:{width:640,height:480}});
+      setStream(s);setCamOn(true);
+      setTimeout(()=>{if(vidRef.current)vidRef.current.srcObject=s;},100);
+      toast("Camera started","success");
+    }catch(e){toast("Camera access denied","error");}
+  };
+
+  const stopCam=()=>{
+    stream?.getTracks().forEach(t=>t.stop());
+    setStream(null);setCamOn(false);setRecog(false);
+    if(intRef.current)clearInterval(intRef.current);
+  };
+
+  const startRecog=()=>{
+    setRecog(true);
+    toast("Face recognition started — scanning every 3 seconds","info");
+    intRef.current=setInterval(async()=>{
+      if(!vidRef.current||!vidRef.current.readyState>=2)return;
+      const frame=captureFrame(vidRef.current);
+      try{
+        const res=await apiFetch("/recognize",{
+          method:"POST",
+          body:JSON.stringify({image:frame,subject})
+        });
+        setBackendOk(true);
+        if(res.status==="no_face")return;
+        const results=res.results||[];
+        for(const r of results){
+          const entry={...r,ts:new Date().toLocaleTimeString()};
+          setDetected(prev=>[entry,...prev].slice(0,30));
+          if(r.status==="present")toast(`✅ ${r.name} marked present (${r.confidence}%)`,"success");
+          else if(r.status==="duplicate")toast(`🔁 ${r.name} already marked today`,"info");
+          else if(r.status==="unknown")toast("❓ Unknown face detected","warn");
+        }
+      }catch(e){
+        setBackendOk(false);
+        toast("Backend offline — recognition paused","error");
+        setRecog(false);clearInterval(intRef.current);
+      }
+    },3000);
+  };
+
+  const stopRecog=()=>{
+    setRecog(false);
+    if(intRef.current)clearInterval(intRef.current);
+    toast("Recognition paused","info");
+  };
+
+  useEffect(()=>()=>{stopCam();},[]);
+
+  const presentCount=detected.filter(d=>d.status==="present").length;
+
+  return (
+    <div style={{display:"flex",flexDirection:"column",gap:18}}>
+      <div className="card fade-up" style={{padding:20}}>
+        <h3 style={{fontSize:15,fontWeight:700,marginBottom:16}}>Session Configuration</h3>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))",gap:12}}>
+          {[
+            {label:"Branch",el:<select className="input" value={branch} onChange={e=>setBranch(e.target.value)}>{BRANCHES.map(b=><option key={b.id} value={b.id}>{b.id}</option>)}</select>},
+            {label:"Year",el:<select className="input" value={year} onChange={e=>setYear(Number(e.target.value))}>{[1,2,3,4].map(y=><option key={y} value={y}>Year {y}</option>)}</select>},
+            {label:"Section",el:<select className="input" value={section} onChange={e=>setSection(e.target.value)}>{["A","B","C"].map(s=><option key={s} value={s}>Sec {s}</option>)}</select>},
+            {label:"Subject",el:<input className="input" placeholder="e.g. Data Structures" value={subject} onChange={e=>setSubject(e.target.value)}/>},
+          ].map(f=>(
+            <div key={f.label}>
+              <label style={{fontSize:10,color:"var(--t3)",display:"block",marginBottom:6,fontWeight:700,textTransform:"uppercase",letterSpacing:".06em"}}>{f.label}</label>
+              {f.el}
+            </div>
+          ))}
+        </div>
+        <div style={{marginTop:14,display:"flex",gap:8,flexWrap:"wrap",alignItems:"center"}}>
+          {!camOn?<button className="btn btn-primary btn-sm" onClick={startCam}><Ic p={P.cam} s={15}/> Start Camera</button>
+            :<button className="btn btn-danger btn-sm" onClick={stopCam}><Ic p={P.x} s={15}/> Stop Camera</button>}
+          {camOn&&!recog&&<button className="btn btn-success btn-sm" onClick={startRecog}><Ic p={P.face} s={15}/> Start Recognition</button>}
+          {recog&&<button className="btn btn-ghost btn-sm" onClick={stopRecog}><Ic p={P.x} s={15}/> Pause</button>}
+          {!backendOk&&<span className="badge badge-red"><Ic p={P.warn} s={11}/> Backend offline</span>}
+        </div>
+      </div>
+
+      <div style={{display:"grid",gridTemplateColumns:"1fr 320px",gap:16}}>
+        <div className="card" style={{padding:18}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14}}>
+            <h3 style={{fontSize:14,fontWeight:700}}>Live Camera Feed</h3>
+            <div style={{display:"flex",gap:6}}>
+              {recog&&<span className="badge badge-green"><span style={{display:"inline-block",width:5,height:5,background:"var(--green)",borderRadius:"50%",animation:"pulse 1.5s infinite",marginRight:3}}/>LIVE</span>}
+              {presentCount>0&&<span className="badge badge-blue">{presentCount} present</span>}
+            </div>
+          </div>
+          <div className="cam-box" style={{aspectRatio:"16/9",borderColor:camOn?"rgba(16,185,129,.3)":"var(--border)"}}>
+            {camOn?(
+              <>
+                <video ref={vidRef} autoPlay playsInline muted style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+                {recog&&<div className="scan-line"/>}
+              </>
+            ):(
+              <div style={{textAlign:"center",color:"var(--t3)"}}>
+                <div style={{fontSize:48,marginBottom:10,opacity:.2}}>📷</div>
+                <div style={{fontSize:13}}>Camera not active</div>
+                <div style={{fontSize:11,marginTop:4}}>Click "Start Camera" above</div>
+              </div>
+            )}
+          </div>
+          <p style={{fontSize:11,color:"var(--t3)",marginTop:10}}>Frames captured every 3 seconds → FastAPI /recognize → face_recognition library</p>
+        </div>
+
+        <div className="card" style={{padding:18,display:"flex",flexDirection:"column",maxHeight:500}}>
+          <h3 style={{fontSize:14,fontWeight:700,marginBottom:14,flexShrink:0}}>Live Detection Log</h3>
+          <div style={{flex:1,overflowY:"auto",display:"flex",flexDirection:"column",gap:7}}>
+            {detected.length===0?(
+              <div style={{textAlign:"center",color:"var(--t3)",padding:"30px 0"}}>
+                <div style={{fontSize:36,opacity:.2}}>🔍</div>
+                <div style={{fontSize:12,marginTop:8}}>No detections yet</div>
+                <div style={{fontSize:11,marginTop:4}}>Start camera & recognition</div>
+              </div>
+            ):detected.map((d,i)=>(
+              <div key={i} style={{padding:"9px 11px",background:"var(--glass)",borderRadius:9,border:`1px solid ${d.status==="present"?"rgba(16,185,129,.2)":d.status==="duplicate"?"rgba(139,92,246,.2)":d.status==="unknown"?"rgba(245,158,11,.2)":"rgba(239,68,68,.2)"}`,animation:i===0?"fadeUp .3s ease-out":"none"}}>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
+                  <div>
+                    <div style={{fontSize:12,fontWeight:600,marginBottom:1}}>{d.name||"Unknown"}</div>
+                    <div style={{fontSize:10,color:"var(--t3)"}}>{d.roll||"—"} {d.branch?`• ${d.branch}`:""}</div>
+                  </div>
+                  <span className={`badge ${d.status==="present"?"badge-green":d.status==="duplicate"?"badge-purple":d.status==="unknown"?"badge-yellow":"badge-red"}`} style={{fontSize:9}}>
+                    {d.status==="present"?"✅ Present":d.status==="duplicate"?"🔁 Duplicate":d.status==="unknown"?"❓ Unknown":"⚠️ Error"}
+                  </span>
+                </div>
+                <div style={{display:"flex",justifyContent:"space-between",marginTop:5}}>
+                  <span style={{fontSize:10,color:"var(--t3)"}}>{d.ts}</span>
+                  {d.confidence!=null&&<span style={{fontSize:10,color:d.confidence>85?"var(--green)":d.confidence>70?"var(--gold)":"var(--red)"}}>{d.confidence?.toFixed(1)}% match</span>}
+                </div>
+                {d.message&&<div style={{fontSize:10,color:"var(--t3)",marginTop:3}}>{d.message}</div>}
+              </div>
+            ))}
+          </div>
+          {detected.length>0&&<button className="btn btn-ghost btn-sm" style={{marginTop:10,flexShrink:0}} onClick={()=>setDetected([])}><Ic p={P.trash} s={13}/> Clear Log</button>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Branches ───────────────────────────────────────────────────────────────────
+function BranchesView({onSelect}){
+  const[hover,setHover]=useState(null);
+  return (
+    <div>
+      <div style={{marginBottom:22}}>
+        <h2 style={{fontSize:19,fontWeight:700,marginBottom:4}}>Academic Branches</h2>
+        <p style={{color:"var(--t2)",fontSize:13}}>Select a branch to manage attendance</p>
+      </div>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(220px,1fr))",gap:14}}>
+        {BRANCHES.map((b,i)=>(
+          <div key={b.id} className="card fade-up" style={{padding:22,cursor:"pointer",transition:"all .2s",animationDelay:`${i*.05}s`,position:"relative",overflow:"hidden",transform:hover===b.id?"translateY(-3px)":"none",borderColor:hover===b.id?`${b.color}55`:"var(--border)"}}
+            onClick={()=>onSelect(b)} onMouseEnter={()=>setHover(b.id)} onMouseLeave={()=>setHover(null)}>
+            <div style={{position:"absolute",top:0,right:0,width:70,height:70,background:b.color,borderRadius:"50%",opacity:.06,transform:"translate(15px,-15px)"}}/>
+            <div style={{fontSize:28,marginBottom:10}}>{b.icon}</div>
+            <h3 style={{fontSize:15,fontWeight:700,marginBottom:3}}>{b.id}</h3>
+            <p style={{fontSize:11,color:"var(--t3)",marginBottom:14,lineHeight:1.5}}>{b.name}</p>
+            <div style={{color:b.color,display:"flex",justifyContent:"flex-end"}}><Ic p={P.chev} s={16}/></div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Students (from backend) ────────────────────────────────────────────────────
+function StudentsView(){
+  const[students,setStudents]=useState([]);
+  const[loading,setLoading]=useState(true);
+  const[offline,setOffline]=useState(false);
+  const[branch,setBranch]=useState("");
+  const[year,setYear]=useState("");
+  const[search,setSearch]=useState("");
+
+  const load=async()=>{
+    setLoading(true);setOffline(false);
+    try{
+      const params=new URLSearchParams();
+      if(branch)params.append("branch",branch);
+      if(year)params.append("year",year);
+      const data=await apiFetch(`/students?${params}`);
+      setStudents(data);
+    }catch(e){setOffline(true);}
+    setLoading(false);
+  };
+
+  useEffect(()=>{load();},[branch,year]);
+
+  const filtered=students.filter(s=>
+    !search||s.name.toLowerCase().includes(search.toLowerCase())||s.roll.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const del=async(roll,name)=>{
+    if(!confirm(`Delete ${name}? This also removes their face data.`))return;
+    try{
+      await apiFetch(`/students/${roll}`,{method:"DELETE"});
+      toast(`${name} deleted`,"success");
+      load();
+    }catch(e){toast(e.message,"error");}
+  };
+
+  return (
+    <div style={{display:"flex",flexDirection:"column",gap:18}}>
+      <div className="card fade-up" style={{padding:18}}>
+        <div style={{display:"flex",gap:10,flexWrap:"wrap",alignItems:"center"}}>
+          <div style={{position:"relative",flex:1,minWidth:180}}>
+            <div style={{position:"absolute",left:11,top:"50%",transform:"translateY(-50%)",color:"var(--t3)",display:"flex"}}><Ic p={P.srch} s={15}/></div>
+            <input className="input" placeholder="Search name or roll…" value={search} onChange={e=>setSearch(e.target.value)} style={{paddingLeft:36}}/>
+          </div>
+          <select className="input" value={branch} onChange={e=>setBranch(e.target.value)} style={{width:130}}>
+            <option value="">All Branches</option>{BRANCHES.map(b=><option key={b.id} value={b.id}>{b.id}</option>)}
+          </select>
+          <select className="input" value={year} onChange={e=>setYear(e.target.value)} style={{width:110}}>
+            <option value="">All Years</option>{[1,2,3,4].map(y=><option key={y} value={y}>Year {y}</option>)}
+          </select>
+          <button className="btn btn-ghost btn-sm" onClick={load}><Ic p={P.refresh} s={14}/></button>
+        </div>
+      </div>
+
+      {offline&&<div className="offline-banner"><Ic p={P.warn} s={15}/> Cannot reach backend. Students loaded from local state only.</div>}
+
+      <div className="card fade-up" style={{overflow:"hidden"}}>
+        <div style={{padding:"14px 18px",borderBottom:"1px solid var(--border)",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+          <span style={{fontSize:13,color:"var(--t2)"}}>{filtered.length} students</span>
+        </div>
+        {loading?<div style={{padding:40,textAlign:"center"}}><Spin s={28}/></div>:filtered.length===0?(
+          <div style={{padding:40,textAlign:"center",color:"var(--t3)"}}>
+            <div style={{fontSize:36,opacity:.2}}>👥</div>
+            <div style={{fontSize:13,marginTop:10}}>No students found</div>
+            <div style={{fontSize:11,marginTop:4}}>Register students using the sidebar</div>
+          </div>
+        ):(
+          <div style={{overflowX:"auto"}}>
+            <table>
+              <thead><tr><th>Student</th><th>Roll Number</th><th>Branch</th><th>Year / Section</th><th>Face Data</th><th>Actions</th></tr></thead>
+              <tbody>
+                {filtered.map(s=>(
+                  <tr key={s.id}>
+                    <td>
+                      <div style={{display:"flex",alignItems:"center",gap:9}}>
+                        <div style={{width:32,height:32,background:"linear-gradient(135deg,#1e3a8a,#312e81)",borderRadius:8,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:800,flexShrink:0}}>{s.name[0]}</div>
+                        <div>
+                          <div style={{fontWeight:500}}>{s.name}</div>
+                          {s.email&&<div style={{fontSize:10,color:"var(--t3)"}}>{s.email}</div>}
+                        </div>
+                      </div>
+                    </td>
+                    <td style={{fontFamily:"monospace",fontSize:12}}>{s.roll}</td>
+                    <td><span className="badge badge-blue">{s.branch}</span></td>
+                    <td style={{color:"var(--t2)"}}>Year {s.year} / Sec {s.section}</td>
+                    <td><span className={`badge ${s.face_enrolled?"badge-green":"badge-yellow"}`}>{s.face_enrolled?"✅ Enrolled":"⚠️ Pending"}</span></td>
+                    <td>
+                      <button className="btn btn-ghost btn-sm" style={{color:"var(--red)"}} onClick={()=>del(s.roll,s.name)}><Ic p={P.trash} s={13}/></button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── Records (from backend) ─────────────────────────────────────────────────────
+function RecordsView(){
+  const[records,setRecords]=useState([]);
+  const[loading,setLoading]=useState(true);
+  const[offline,setOffline]=useState(false);
+  const[dateF,setDateF]=useState("");
+  const[branchF,setBranchF]=useState("");
+
+  const load=async()=>{
+    setLoading(true);setOffline(false);
+    try{
+      const params=new URLSearchParams();
+      if(dateF)params.append("date_filter",dateF);
+      if(branchF)params.append("branch",branchF);
+      const data=await apiFetch(`/attendance?${params}`);
+      setRecords(data);
+    }catch(e){setOffline(true);}
+    setLoading(false);
+  };
+
+  useEffect(()=>{load();},[dateF,branchF]);
+
+  const exportCSV=()=>{
+    const header="Name,Roll,Branch,Year,Section,Date,Time,Confidence,Subject\n";
+    const rows=records.map(r=>`${r.name},${r.roll},${r.branch},${r.year},${r.section},${r.date},${r.time},${r.confidence?.toFixed(1)}%,${r.subject||""}`).join("\n");
+    const blob=new Blob([header+rows],{type:"text/csv"});
+    const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`attendance_${dateF||"all"}.csv`;a.click();
+    toast("CSV exported","success");
+  };
+
+  return (
+    <div style={{display:"flex",flexDirection:"column",gap:18}}>
+      <div className="card fade-up" style={{padding:18}}>
+        <div style={{display:"flex",gap:10,flexWrap:"wrap",alignItems:"center"}}>
+          <input className="input" type="date" value={dateF} onChange={e=>setDateF(e.target.value)} style={{width:155}}/>
+          <select className="input" value={branchF} onChange={e=>setBranchF(e.target.value)} style={{width:130}}>
+            <option value="">All Branches</option>{BRANCHES.map(b=><option key={b.id} value={b.id}>{b.id}</option>)}
+          </select>
+          <button className="btn btn-ghost btn-sm" onClick={()=>{setDateF("");setBranchF("");}}>Clear</button>
+          <button className="btn btn-ghost btn-sm" onClick={load}><Ic p={P.refresh} s={14}/></button>
+          <button className="btn btn-primary btn-sm" style={{marginLeft:"auto"}} onClick={exportCSV} disabled={records.length===0}><Ic p={P.dl} s={14}/> Export CSV</button>
+        </div>
+      </div>
+
+      {offline&&<div className="offline-banner"><Ic p={P.warn} s={15}/> Backend offline — cannot load records.</div>}
+
+      <div className="card fade-up" style={{overflow:"hidden"}}>
+        <div style={{padding:"14px 18px",borderBottom:"1px solid var(--border)"}}><span style={{fontSize:13,color:"var(--t2)"}}>{records.length} records</span></div>
+        {loading?<div style={{padding:40,textAlign:"center"}}><Spin s={28}/></div>:records.length===0?(
+          <div style={{padding:40,textAlign:"center",color:"var(--t3)"}}>
+            <div style={{fontSize:36,opacity:.2}}>📊</div>
+            <div style={{fontSize:13,marginTop:10}}>No records found</div>
+          </div>
+        ):(
+          <div style={{overflowX:"auto"}}>
+            <table>
+              <thead><tr><th>Student</th><th>Roll</th><th>Branch</th><th>Date</th><th>Time</th><th>Subject</th><th>Confidence</th></tr></thead>
+              <tbody>
+                {records.map((r,i)=>(
+                  <tr key={i}>
+                    <td style={{fontWeight:500}}>{r.name}</td>
+                    <td style={{fontFamily:"monospace",fontSize:12}}>{r.roll}</td>
+                    <td><span className="badge badge-blue">{r.branch}</span></td>
+                    <td style={{color:"var(--t2)",fontSize:12}}>{r.date}</td>
+                    <td style={{color:"var(--t2)",fontSize:12}}>{r.time}</td>
+                    <td style={{color:"var(--t3)",fontSize:12}}>{r.subject||"—"}</td>
+                    <td>
+                      <div style={{display:"flex",alignItems:"center",gap:6}}>
+                        <div style={{width:44,height:4,background:"var(--border)",borderRadius:2,overflow:"hidden"}}>
+                          <div style={{width:`${r.confidence}%`,height:"100%",background:r.confidence>90?"var(--green)":r.confidence>80?"var(--gold)":"var(--red)",borderRadius:2}}/>
+                        </div>
+                        <span style={{fontSize:11,color:"var(--t3)"}}>{r.confidence?.toFixed(1)}%</span>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── Reports (from backend) ─────────────────────────────────────────────────────
+function ReportsView(){
+  const[stats,setStats]=useState(null);
+  const[records,setRecords]=useState([]);
+  const[students,setStudents]=useState([]);
+  const[loading,setLoading]=useState(true);
+
+  useEffect(()=>{
+    (async()=>{
+      setLoading(true);
+      try{
+        const[s,r,st]=await Promise.all([apiFetch("/stats"),apiFetch("/attendance"),apiFetch("/students")]);
+        setStats(s);setRecords(r);setStudents(st);
+      }catch(e){toast("Backend offline","error");}
+      setLoading(false);
+    })();
+  },[]);
+
+  // compute per-student summary
+  const summary=students.map(s=>{
+    const attended=records.filter(r=>r.roll===s.roll).length;
+    return {...s,attended,pct:records.length?Math.round(attended/Math.max(1,new Set(records.map(r=>r.date)).size)*100):0};
+  }).sort((a,b)=>a.pct-b.pct);
+
+  const exportFullCSV=()=>{
+    const header="Name,Roll,Branch,Attended,Total Classes,Percentage\n";
+    const rows=summary.map(s=>`${s.name},${s.roll},${s.branch},${s.attended},${new Set(records.map(r=>r.date)).size},${s.pct}%`).join("\n");
+    const blob=new Blob([header+rows],{type:"text/csv"});
+    const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="attendance_report.csv";a.click();
+    toast("Full report exported","success");
+  };
+
+  return (
+    <div style={{display:"flex",flexDirection:"column",gap:18}}>
+      {loading?<div style={{padding:60,textAlign:"center"}}><Spin s={32}/></div>:(
+        <>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(180px,1fr))",gap:14}}>
+            {[
+              {l:"Total Students",v:stats?.total_students??0,c:"#3b82f6"},
+              {l:"Today Present",v:stats?.today_present??0,c:"#10b981"},
+              {l:"Face Enrolled",v:stats?.face_enrolled??0,c:"#6366f1"},
+              {l:"Total Records",v:stats?.total_records??0,c:"#8b5cf6"},
+            ].map((s,i)=>(
+              <div key={i} className="card fade-up" style={{padding:18}}>
+                <div style={{fontSize:10,color:"var(--t3)",marginBottom:8,fontWeight:700,textTransform:"uppercase",letterSpacing:".06em"}}>{s.l}</div>
+                <div style={{fontSize:26,fontWeight:800,fontFamily:"Syne",color:s.c}}>{s.v}</div>
+              </div>
+            ))}
+          </div>
+          <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
+            <button className="btn btn-primary btn-sm" onClick={exportFullCSV}><Ic p={P.dl} s={14}/> Export Full Report</button>
+          </div>
+          <div className="card fade-up" style={{overflow:"hidden"}}>
+            <div style={{padding:"14px 18px",borderBottom:"1px solid var(--border)"}}><h3 style={{fontSize:14,fontWeight:700}}>Student Attendance Summary</h3></div>
+            {summary.length===0?(
+              <div style={{padding:40,textAlign:"center",color:"var(--t3)"}}>No students registered yet.</div>
+            ):(
+              <div style={{overflowX:"auto"}}>
+                <table>
+                  <thead><tr><th>Student</th><th>Roll</th><th>Branch</th><th>Attended</th><th>Face</th><th>Percentage</th><th>Status</th></tr></thead>
+                  <tbody>
+                    {summary.map((s,i)=>(
+                      <tr key={i}>
+                        <td style={{fontWeight:500}}>{s.name}</td>
+                        <td style={{fontFamily:"monospace",fontSize:12}}>{s.roll}</td>
+                        <td><span className="badge badge-blue">{s.branch}</span></td>
+                        <td>{s.attended}</td>
+                        <td><span className={`badge ${s.face_enrolled?"badge-green":"badge-yellow"}`}>{s.face_enrolled?"✅":"⚠️"}</span></td>
+                        <td>
+                          <div style={{display:"flex",alignItems:"center",gap:7}}>
+                            <div style={{width:52,height:5,background:"var(--border)",borderRadius:3,overflow:"hidden"}}>
+                              <div style={{width:`${Math.min(s.pct,100)}%`,height:"100%",background:s.pct>=75?"var(--green)":"var(--red)",borderRadius:3}}/>
+                            </div>
+                            <span style={{fontSize:12,fontWeight:700,color:s.pct>=75?"var(--green)":"var(--red)"}}>{s.pct}%</span>
+                          </div>
+                        </td>
+                        <td><span className={`badge ${s.pct>=75?"badge-green":"badge-red"}`}>{s.pct>=75?"✅ Regular":"⚠️ Shortage"}</span></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+// ── Admin Panel ────────────────────────────────────────────────────────────────
+function AdminPanel(){
+  const[stats,setStats]=useState(null);
+  useEffect(()=>{apiFetch("/stats").then(setStats).catch(()=>{});}, []);
+  return (
+    <div style={{display:"flex",flexDirection:"column",gap:18}}>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(170px,1fr))",gap:14}}>
+        {[
+          {l:"Total Students",v:stats?.total_students??"…",c:"#3b82f6"},
+          {l:"Face Enrolled",v:stats?.face_enrolled??"…",c:"#10b981"},
+          {l:"Today Present",v:stats?.today_present??"…",c:"#f59e0b"},
+          {l:"Total Records",v:stats?.total_records??"…",c:"#8b5cf6"},
+        ].map((s,i)=>(
+          <div key={i} className="card" style={{padding:18}}>
+            <div style={{fontSize:10,color:"var(--t3)",marginBottom:8,fontWeight:700,textTransform:"uppercase",letterSpacing:".06em"}}>{s.l}</div>
+            <div style={{fontSize:26,fontWeight:800,fontFamily:"Syne",color:s.c}}>{s.v}</div>
+          </div>
+        ))}
+      </div>
+      <div className="card fade-up" style={{padding:22}}>
+        <h3 style={{fontSize:14,fontWeight:700,marginBottom:14}}>System Information</h3>
+        <div style={{display:"flex",flexDirection:"column",gap:10}}>
+          {[
+            {l:"Backend",v:`${API}`},
+            {l:"Database",v:"attendance.db (SQLite)"},
+            {l:"Face Store",v:"faces.pkl (pickle)"},
+            {l:"Recognition",v:"face_recognition + dlib"},
+            {l:"API Framework",v:"FastAPI + Uvicorn"},
+          ].map(r=>(
+            <div key={r.l} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"8px 12px",background:"var(--glass)",borderRadius:8,border:"1px solid var(--border)"}}>
+              <span style={{fontSize:12,color:"var(--t3)"}}>{r.l}</span>
+              <span style={{fontSize:12,fontFamily:"monospace",color:"var(--t2)"}}>{r.v}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="card fade-up" style={{padding:22}}>
+        <h3 style={{fontSize:14,fontWeight:700,marginBottom:14}}>Quick Setup Guide</h3>
+        <div style={{display:"flex",flexDirection:"column",gap:8}}>
+          {[
+            "pip install fastapi uvicorn python-multipart face_recognition pillow numpy",
+            "uvicorn main:app --reload --host 0.0.0.0 --port 8000",
+            "Register students via 'Register Student' in sidebar",
+            "Start camera + recognition in 'Take Attendance'",
+          ].map((step,i)=>(
+            <div key={i} style={{display:"flex",gap:10,alignItems:"flex-start",padding:"8px 12px",background:"var(--glass)",borderRadius:8}}>
+              <span style={{width:20,height:20,background:"rgba(59,130,246,.2)",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:10,fontWeight:700,color:"var(--blue)",flexShrink:0}}>{i+1}</span>
+              <code style={{fontSize:11,color:"var(--t2)",fontFamily:"monospace",lineHeight:1.6}}>{step}</code>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Main App ───────────────────────────────────────────────────────────────────
+function App(){
+  const[teacher,setTeacher]=useState(()=>{
+    try{return JSON.parse(sessionStorage.getItem("nitj_teacher"));}catch{return null;}
+  });
+  const[av,setAv]=useState("dashboard");
+  const[col,setCol]=useState(false);
+
+  const logout=()=>{sessionStorage.removeItem("nitj_teacher");setTeacher(null);};
+  const login=(t)=>{sessionStorage.setItem("nitj_teacher",JSON.stringify(t));setTeacher(t);};
+
+  if(!teacher)return <><Login onLogin={login}/><Toasts/></>;
+
+  const sw=col?68:238;
+  const titles={
+    dashboard:"Dashboard",attendance:"Take Attendance",register:"Register Student",
+    branches:"Branches",students:"Students",records:"Attendance Records",
+    reports:"Reports & Analytics",admin:"Admin Panel"
+  };
+
+  return (
+    <div style={{minHeight:"100vh",background:"var(--bg)"}}>
+      <div className="grid-bg"/>
+      <Sidebar av={av} setAv={setAv} teacher={teacher} onLogout={logout} col={col} setCol={setCol}/>
+      <div style={{marginLeft:sw,transition:"margin-left .25s",minHeight:"100vh"}}>
+        <Topbar title={titles[av]||av} teacher={teacher} sw={sw}/>
+        <main style={{padding:"82px 24px 24px",maxWidth:1380}}>
+          {av==="dashboard"&&<Dashboard teacher={teacher} setAv={setAv}/>}
+          {av==="attendance"&&<AttendanceTaker teacher={teacher}/>}
+          {av==="register"&&<RegisterStudent/>}
+          {av==="branches"&&<BranchesView onSelect={b=>{toast(`Opening ${b.name}...`,"info");setAv("attendance");}}/>}
+          {av==="students"&&<StudentsView/>}
+          {av==="records"&&<RecordsView/>}
+          {av==="reports"&&<ReportsView/>}
+          {av==="admin"&&teacher?.is_admin&&<AdminPanel/>}
+        </main>
+      </div>
+      <Toasts/>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>

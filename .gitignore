@@ -1,0 +1,4 @@
+__pycache__/
+*.pyc
+attendance.db
+faces.pkl
