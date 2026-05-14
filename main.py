@@ -521,11 +521,7 @@ async def admin_reset_face(req:FaceResetReq, user=Depends(get_user)):
     store = load_faces()
     store[f"cls_{req.classroom_id}_stu_{req.student_id}"] = {
         "encoding":enc,"student_id":req.student_id,"classroom_id":req.classroom_id,
-<<<<<<< HEAD
         "name":row["name"],"roll":row["roll_number"]}
-=======
-        "name":row["roll_number"],"roll":row["roll_number"]}
->>>>>>> eea9c271eeb319b8750067a01b90d08ba1bb5abc
     save_faces(store)
     now = datetime.now().isoformat()
     conn.execute("UPDATE classroom_members SET face_enrolled=1,face_locked=1,face_updated_by=?,face_updated_at=? WHERE classroom_id=? AND user_id=?",
@@ -558,7 +554,6 @@ async def admin_clear_face(classroom_id:str=Form(...), student_id:str=Form(...),
     conn.close()
     return {"success":True,"message":"Face data cleared. Student can re-enroll."}
 
-<<<<<<< HEAD
 # Purane @app.get("/face_audit_logs/{classroom_id}") ko isse badal dein:
 @app.get("/admin/face_audit/{classroom_id}")
 async def face_audit_logs(classroom_id:str, user=Depends(get_uid)): # get_uid use karein authentication ke liye
@@ -571,20 +566,6 @@ async def face_audit_logs(classroom_id:str, user=Depends(get_uid)): # get_uid us
         WHERE f.classroom_id=? ORDER BY f.performed_at DESC""", (classroom_id,)).fetchall()
     conn.close()
     return [dict(r) for r in rows]
-=======
-@app.get("/face_audit_logs/{classroom_id}")
-async def face_audit_logs(classroom_id:str, user=Depends(get_user)):
-    require_admin(classroom_id,user["id"])
-    conn = get_db()
-    rows = conn.execute("""SELECT f.*,u1.name student_name,u2.name performed_by_name
-        FROM face_audit_logs f
-        LEFT JOIN users u1 ON f.student_id=u1.id
-        LEFT JOIN users u2 ON f.performed_by=u2.id
-        WHERE f.classroom_id=? ORDER BY f.performed_at DESC""",(classroom_id,)).fetchall()
-    conn.close()
-    return [dict(r) for r in rows]
-
->>>>>>> eea9c271eeb319b8750067a01b90d08ba1bb5abc
 # ══════════════════════════════════════════════════════════════════
 # ATTENDANCE
 # ══════════════════════════════════════════════════════════════════
@@ -875,7 +856,6 @@ async def health():
     store=load_faces()
     return {"status":"ok","version":"9.0.0","face_recognition":"installed" if fr else "NOT INSTALLED",
             "total_encodings":len(store),"timestamp":datetime.now().isoformat()}
-<<<<<<< HEAD
 
 
 
@@ -893,19 +873,3 @@ from fastapi.responses import FileResponse
 async def get_logo():
     return FileResponse(r'C:\Users\VIKASH YADAV\Desktop\all nitj\nitja1\download.jpg')
 
-
-
-from email_validator import validate_email, EmailNotValidError
-
-@app.post("/register")
-async def register(req: RegReq):
-    try:
-        # Check if email is valid and has deliverable MX records
-        email_info = validate_email(req.email, check_deliverability=True)
-        email = email_info.normalized
-    except EmailNotValidError as e:
-        raise HTTPException(400, f"Invalid or non-existent email: {str(e)}")
-    
-    # ... Proceed to check DB and save
-=======
->>>>>>> eea9c271eeb319b8750067a01b90d08ba1bb5abc

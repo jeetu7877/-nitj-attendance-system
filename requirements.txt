@@ -15,7 +15,6 @@ click==8.3.3
 cmake==4.3.2
 colorama==0.4.6
 cryptography==48.0.0
-deepface==0.0.100
 dlib==20.0.1
 dnspython==2.8.0
 ecdsa==0.19.2
@@ -76,7 +75,6 @@ python-jose==3.5.0
 python-multipart==0.0.28
 PyYAML==6.0.3
 requests==2.33.1
-retina-face==0.0.17
 rich==15.0.0
 rsa==4.9.1
 scipy==1.17.1
@@ -84,9 +82,7 @@ six==1.17.0
 soupsieve==2.8.3
 starlette==1.0.0
 sympy==1.14.0
-tensorflow==2.21.0
 termcolor==3.3.0
-tf_keras==2.21.0
 tqdm==4.67.3
 typing-inspection==0.4.2
 typing_extensions==4.15.0
