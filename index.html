@@ -1,4 +1,4 @@
-cat > /mnt/user-data/outputs/nitj.html << 'HTMLEOF'
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -197,7 +197,7 @@ tbody tr:hover td{background:var(--off);}
 <script type="text/babel">
 const {useState,useEffect,useRef,useCallback,useMemo}=React;
 const API=window.location.hostname==="localhost"||window.location.hostname==="127.0.0.1"
- ?"http://localhost:8000":window.location.origin;
+?"http://localhost:8000":"https://nitj-attendance-system-production.up.railway.app";
 const COLORS=["#1255a6","#0D47A1","#166534","#991b1b","#4c1d95","#9a3412","#134e4a","#374151"];
 const BRANCHES=["CSE","IT","ECE","EE","ME","CE","ICE","Textile","Biotech","Civil"];
 const getToken=()=>localStorage.getItem("nitj_tok");
