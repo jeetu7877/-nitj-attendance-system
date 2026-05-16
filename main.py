@@ -28,7 +28,11 @@ from fastapi.exceptions import RequestValidationError
 from pydantic import BaseModel
 from passlib.context import CryptContext
 from jose import JWTError, jwt
+from fastapi.responses import FileResponse
 
+@app.get("/")
+async def home():
+    return FileResponse("index.html")
 DB_PATH    = "nitj.db"
 PKL_PATH   = "faces.pkl"
 UPLOAD_DIR = "uploads"
